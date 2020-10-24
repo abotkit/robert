@@ -3,7 +3,7 @@ FROM python:3.7-slim
 RUN apt-get update -y
 RUN apt-get install -y curl
 
-RUN pip install requests
+RUN pip install requests gunicorn
 
 COPY requirements.txt /opt/botkit/requirements.txt
 WORKDIR /opt/botkit
@@ -14,4 +14,6 @@ COPY . /opt/botkit
 
 EXPOSE 5000
 
-ENTRYPOINT ["python", "app.py"]
+ENV ABOTKIT_ROBERT_PORT=5000
+
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:$ABOTKIT_ROBERT_PORT", "robert:app"]
