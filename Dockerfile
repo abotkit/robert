@@ -16,4 +16,4 @@ EXPOSE 5000
 
 ENV ABOTKIT_ROBERT_PORT=5000
 
-ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:$ABOTKIT_ROBERT_PORT", "robert:app"]
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:${ABOTKIT_ROBERT_PORT}", "robert:app"]
