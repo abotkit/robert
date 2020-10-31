@@ -1,0 +1,36 @@
+{
+  "de": {
+    "bye": [
+      "Tsch\u00fc\u00df",
+      "Bis bald",
+      "Bis dann",
+      "Bis sp\u00e4ter!",
+      "Ciao!"
+    ],
+    "hello": [
+      "Moin",
+      "Hallo",
+      "Hi, wie geht's?",
+      "Hey"
+    ]
+  },
+  "en": {
+    "bye": [
+      "Bye",
+      "Talk to you later",
+      "Have a nice day",
+      "Take care",
+      "Catch you later"
+    ],
+    "hello": [
+      "Hello, world!",
+      "Hello, friend. Hello, friend.",
+      "Howdy",
+      "What's up",
+      "Yo",
+      "Hello mister",
+      "Doctor.",
+      "How you doin?"
+    ]
+  }
+}

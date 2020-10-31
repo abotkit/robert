@@ -1,0 +1,71 @@
+{
+  "name": "Robert",
+  "language": "de",
+  "core": {
+    "name": "transformer",
+    "intents": {
+      "hi": "hello",
+      "Hello": "hello",
+      "hello": "hello",
+      "hi there": "hello",
+      "Hackernews": "hn",
+      "Hacker news": "hn",
+      "What is on Hackernews today?": "hn",
+      "Shout": "shout",
+      "Can you shout?": "shout",
+      "Bye": "bye",
+      "ciao": "bye",
+      "bye bye": "bye",
+      "see you": "bye",
+      "moin": "hello"
+    }
+  },
+  "actions": [
+    {
+      "name": "Shout",
+      "settings": {},
+      "active": {
+        "intents": [
+          "shout"
+        ]
+      }
+    },
+    {
+      "name": "Mail",
+      "settings": {
+        "port": 465,
+        "smtp_server": "smtp.gmail.com"
+      },
+      "active": false
+    },
+    {
+      "name": "Talk",
+      "settings": {},
+      "active": {
+        "intents": [
+          "hello",
+          "bye"
+        ]
+      }
+    },
+    {
+      "name": "Hackernews - Top Story",
+      "settings": {},
+      "active": {
+        "intents": [
+          "hn"
+        ]
+      }
+    },
+    {
+      "name": "Weather",
+      "settings": {},
+      "active": false
+    },
+    {
+      "name": "Reverse",
+      "settings": {},
+      "active": false
+    }
+  ]
+}

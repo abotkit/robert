@@ -1,30 +1,9 @@
-# Intent classification
-torch
+torch==1.7.0
 sentence-transformers>=0.3,<0.4
+fastapi==0.61.1
+fastapi-utils==0.2.1
+uvicorn==0.12.2
 # tf needed because of https://github.com/huggingface/transformers/issues/7333
 # can be removed if peer dependency is fixed
 tensorflow==2.3.1
-
-
-# Admin interface
-Flask==1.1.1
-Flask-Cors==3.0.8
-flask-api==2.0
-
-# Data crawler
-lxml==4.4.1
 requests>=2.20.0
-cssselect==1.1.0
-
-# Data sources
-wget==3.2
-
-# Classifier
-tqdm==4.36.1
-gdown==3.9.1
-
-#Tokenizer
-spacy==2.2.3
-
-# Utils
-geotext

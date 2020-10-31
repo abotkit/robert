@@ -1,266 +1,227 @@
-import os
-import sys
+from http import HTTPStatus
+from typing import Optional, List
+from fastapi import FastAPI, Response, Body, Request
+from fastapi_utils.tasks import repeat_every
+from pydantic import BaseModel
 
-from flask import Flask, jsonify, request, Response, abort
-from flask_cors import CORS
-from flask_api import status
+import os
+import pickle
 import json
 
 from actions.actions import ACTIONS
-from flask_api import status
 from persistence.bot_reader import BotReader
 from persistence.bot_writer import BotWriter
 
-app = Flask(__name__)
-root = os.path.dirname(os.path.abspath(__file__))
-CORS(app)
+app = FastAPI()
 
+bot = None
+core = None
 
-# Error handling
-def check_setup():
-    global core
-    global bot
+CACHE_PATH = 'bot.pkl'
+CONFIGURATION = 'bot.json'
+PHRASES_FILE = os.path.join('actions', 'phrases.json')
+HAS_UPDATES = False
 
-    "Checks if Bot has at least one action and example"
-    if core.intents == {}:
-        raise Exception('Add an intent before using your Bot')
+class Message(BaseModel):
+  query: str
+  identifier: Optional[str] = None
 
-    if not bot.actions:
-        raise Exception('Add an actions before using your Bot')
+class Language(BaseModel):
+  country_code: str
 
+class NewExample(BaseModel):
+  example: str
+  intent: str
 
-@app.route('/')
-def index_route():
-    if 'bot' in globals():
-        return 'I am alive'
-    else:
-        return 'You need to load a bot first using the [GET] /bot/:bot_name endpoint', status.HTTP_503_SERVICE_UNAVAILABLE
+class RemoveExample(BaseModel):
+  example: str
 
+class Action(BaseModel):
+  name: str
+  settings: str
+  intent: str
 
-@app.route('/intent', methods=['POST'])
-def intent_route():
-    try:
-        check_setup()
-    except Exception as e:
-        return jsonify(e), status.HTTP_412_PRECONDITION_FAILED
-    query = request.json['query']
-    result = core.intent_of(query)
-    return jsonify(result)
+class DeleteAction(BaseModel):
+  intent: str
 
+class Phrase(BaseModel):
+  intent: str
+  text: str
 
-@app.route('/handle', methods=['POST'])
-def handle_route():
-    try:
-        check_setup()
-    except Exception as e:
-        return jsonify(e), status.HTTP_412_PRECONDITION_FAILED
-    query = request.json['query']
-    recipient_id = request.json['identifier']
-    answer = bot.handle(query)
-    result = dict(
-        recipient_id=recipient_id,
-        text=answer
-    )
-    return jsonify(result)
+class ListOfPhrases(BaseModel):
+  phrases: List[Phrase]
 
+class BotMeta(BaseModel):
+  name: str
 
-@app.route('/explain', methods=['POST'])
-def explain_route():
-    try:
-        check_setup()
-    except Exception as e:
-        return jsonify(e), status.HTTP_412_PRECONDITION_FAILED
-    query = request.json['query']
-    result = bot.explain(query)
-    return jsonify(result)
+def cache_bot():
+  with open(CACHE_PATH, "wb") as handle:
+    pickle.dump(bot, handle)
 
+def store_bot():
+  global HAS_UPDATES
+  HAS_UPDATES = True
 
-@app.route('/language', methods=['GET', 'POST'])
-def bot_language():
-    if request.method == 'GET':
-        return jsonify(bot.language)
-    elif request.method == 'POST':
-        if request.json['language'] == 'de' or request.json['language'] == 'en':
-            bot.language = request.json['language']
-            return Response(status = 200)
-        else:
-            abort(404, 'language not supported.')
+@app.on_event("startup")
+@repeat_every(seconds=60*5)
+def store_files() -> None:
+  global HAS_UPDATES
+  if HAS_UPDATES:
+    BotWriter(bot).write(CONFIGURATION)
+    HAS_UPDATES = False
+    cache_bot()
+    # TODO: Push files to MinIO
 
+@app.on_event("startup")
+def startup_event():
+  global bot
+  global core
 
-@app.route('/example/<string:intent>', methods=['GET'])
-def intent_example_route(intent):
+  if os.path.exists(CACHE_PATH):
+    with open(CACHE_PATH, "rb") as handle:
+      bot = pickle.load(handle)
+      core = bot.core
+  else:
+    path = os.path.join(CONFIGURATION)
+    bot = BotReader(path).load()
+    core = bot.core
+    cache_bot()
+
+@app.get("/")
+def root():
+  return '"When the legend becomes fact, you print the legend." - Robert Ford'
+
+@app.get("/alive")
+def alive():
+  return Response(status_code=HTTPStatus.OK)
+
+@app.post('/intent')
+def intent(message: Message):
+  return core.intent_of(message.query)
+
+@app.post('/handle')
+def handle_route(message: Message):
+  return {
+    "recipient_id": message.identifier,
+    "text": bot.handle(message.query)
+  }
+
+@app.post('/explain')
+def explain_route(message: Message):
+  return bot.explain(message.query)
+
+@app.get('/language')
+def get_language():
+  return bot.language
+
+@app.post('/language')
+def set_language(language: Language):
+  if language.country_code == 'de' or language.country_code == 'en':
+    bot.language = language.country_code
+    store_bot()
+    return Response(status_code=HTTPStatus.OK)
+  else:
+    return Response(status_code=HTTPStatus.BAD_REQUEST, content='language not supported.')
+
+@app.get('/example/{intent}')
+def intent_examples(intent: str):
     examples = []
     for example in core.intents:
         if intent == core.intents[example]:
             examples.append(example)
-    return jsonify(examples)
+    return examples
 
+@app.get('/example')
+def get_examples():
+  return core.intents
 
-@app.route('/example', methods=['GET', 'POST', 'DELETE'])
-def example_route():
-    global core
+@app.post('/example')
+def get_examples(example: NewExample):
+  core.add_intent(example.example, example.intent)
+  store_bot()
+  return Response(status_code=HTTPStatus.OK)
 
-    if request.method == 'GET':
-        return jsonify(core.intents)
-    elif request.method == 'POST':
-        example = request.json['example']
-        intent = request.json['intent']
-        core.add_intent(example, intent)
+@app.delete('/example')
+def get_examples(example: RemoveExample):
+  core.remove_intent(example.example)
+  store_bot()
+  return Response(status_code=HTTPStatus.OK) 
 
-        result = {'example_count': len(core.intents)}
-        return jsonify(result)
-    elif request.method == 'DELETE':
-        example = request.json['example']
-        core.remove_intent(example)
-        result = {'example_count': len(core.intents)}
-        return jsonify(result)        
+@app.get('/actions')
+def get_actions():  
+  return [{
+      'name': a['action'].name,
+      'description': a['action'].description,
+      'settings': a['action'].settings,
+      'active': a['active'],
+  } for a in bot.actions]
 
+@app.post('/actions')
+def add_action(action: Action):  
+  result = next(a for a in ACTIONS if a.name == action.name)
+  bot.add_action(action.intent, result(settings=action.settings))
+  store_bot()
+  return Response(status_code=HTTPStatus.OK)
 
-@app.route('/actions', methods=['GET', 'POST', 'DELETE'])
-def actions_route():
-    if request.method == 'GET':
-        return list_actions()
-    elif request.method == 'POST':
-        return add_action()
-    elif request.method == 'DELETE':
-        return delete_action()
+@app.delete('/actions')
+def delete_action(action: DeleteAction):
+  bot.delete_action(action.intent)
+  store_bot()
+  return Response(status_code=HTTPStatus.OK)
 
+@app.get('/name')
+def get_name():
+  return bot.name
 
-@app.route('/available/actions', methods=['GET'])
+@app.post('/name')
+def set_name(meta: BotMeta):
+  bot.name = meta.name
+  store_bot()
+  return Response(status_code=HTTPStatus.OK)
+
+@app.get('/available/actions')
 def available_actions():
-    res = [{
-        'name': action.name,
-        'description': action.description
-    } for action in ACTIONS]
-
-    return jsonify(res)
+  return [{
+      'name': action.name,
+      'description': action.description
+  } for action in ACTIONS]
 
 
-def list_actions():
-    global bot
+def read_phrases():
+  phrases_file = PHRASES_FILE
+  phrases = {}
+  if os.path.exists(phrases_file):
+    with open(phrases_file) as handle:
+      phrases = json.load(handle)
+  return phrases
 
-    res = [{
-        'name': a['action'].name,
-        'description': a['action'].description,
-        'settings': a['action'].settings,
-        'active': a['active'],
-    } for a in bot.actions]
-    return jsonify(res)
+def update_phrases(phrases):
+  phrases_file = PHRASES_FILE
+  with open(phrases_file, 'w') as handle:
+      json.dump(phrases, handle, indent=2, sort_keys=True)
+  bot.update_actions()  
 
+@app.get('/phrases')
+def get_phrases():
+  phrases = read_phrases()
+  return phrases[bot.language]
 
-def add_action():
-    global bot
+@app.post('/phrases')
+def add_phrases(list_of_phrases: ListOfPhrases):
+  phrases = read_phrases()
+  for phrase in list_of_phrases.phrases:
+    if phrase.intent in phrases[bot.language]:
+      phrases[bot.language][phrase.intent].append(phrase.text)
+    else:
+      phrases[bot.language][phrase.intent] = [phrase.text]
+  update_phrases(phrases)
+  return Response(status_code=HTTPStatus.OK)
 
-    name = request.json['name']
-    settings = request.json['settings']
-    intent = request.json['intent']
-
-    action = next(a for a in ACTIONS if a.name == name)
-    bot.add_action(intent, action(settings=settings))
-
-    result = {'action_added': name}
-    return jsonify(result)
-
-
-def delete_action():
-    global bot
-
-    intent = request.json['intent']
-    bot.delete_action(intent)
-
-    result = {'action_deleted': intent}
-    return jsonify(result)
-
-
-@app.route('/bot', methods=['GET'])
-def bot_route():
-    return jsonify({
-        'name': bot.name,
-        'actions': bot.actions,
-    })
-
-
-# Load and save bots
-@app.route('/bots', methods=['GET', 'POST'])
-def bots_route():
-    if request.method == 'GET':
-        return list_bots()
-    elif request.method == 'POST':
-        return save_bot()
-
-
-def list_bots():
-    saved_bots = os.listdir(os.path.join(root, 'bots'))
-    saved_bots = [sb for sb in saved_bots if sb.endswith('.json')]
-    return jsonify(saved_bots)
-
-
-def save_bot():
-    try:
-        if 'configuration' in request.json:
-            if 'phrases' in request.json['configuration']:
-                with open(os.path.join(root, 'actions', 'phrases.json'), 'w') as handle:
-                    json.dump(request.json['configuration']['phrases'], handle, indent=2, sort_keys=True)
-                del request.json['configuration']['phrases']
-
-            with open(os.path.join(root, 'bots', request.json['configuration']['name'] + '.json'), 'w') as handle:
-                json.dump(request.json['configuration'], handle, indent=2)
-            return jsonify('Successfully wrote configuration of bot {} to file'.format(request.json['configuration']['name']))       
-        else:
-            bot.name = request.json['bot_name']
-            BotWriter(bot).write(os.path.join(root, 'bots', bot.name + '.json'))
-            return jsonify('Successfully wrote current bot {} to file'.format(bot.name))
-    except Exception as e:
-        return jsonify(e)
-
-
-@app.route('/phrases', methods=['POST', 'DELETE'])
-def add_phrases():
-    global bot
-    phrases_file = os.path.join(root, 'actions', 'phrases.json')
-    phrases = {}
-    if os.path.exists(phrases_file):
-        try:
-            with open(phrases_file) as handle:
-                phrases = json.load(handle)
-        except Exception as e:
-            return jsonify(e)
-
-    if request.method == 'POST':
-        for phrase in request.json['phrases']:
-            if phrase['intent'] in phrases:
-                phrases[phrase['intent']].append(phrase['text'])
-            else:
-                phrases[phrase['intent']] = [phrase['text']]
-    elif request.method == 'DELETE':
-        for phrase in request.json['phrases']:
-            if phrase['intent'] in phrases:
-                phrases[phrase['intent']] = [text for text in phrases[phrase['intent']] if text != phrase['text']]
-                
-    try:
-        with open(phrases_file, 'w') as handle:
-            json.dump(phrases, handle, indent=2, sort_keys=True)
-        
-        bot.update_actions()
-        return jsonify('Updated phrases successfully')
-    except Exception as e:
-        return jsonify(e)
-             
-
-@app.route('/bot/<bot_name>', methods=['GET'])
-def load_bot(bot_name):
-    global bot
-    global core
-
-    try:
-        path = os.path.join(root, 'bots', bot_name + '.json')
-        bot = BotReader(path).load()
-        core = bot.core
-        return jsonify('Successfully loaded bot from {}.json'.format(bot_name))
-    except Exception as e:
-        return jsonify(e)
-
-
-if __name__ == '__main__':
-    port = os.getenv('ABOTKIT_ROBERT_PORT', 5000)
-    app.run(debug=True, port=port)
+@app.delete('/phrases')
+def delete_phrases(list_of_phrases: ListOfPhrases):
+  phrases = read_phrases()
+  for phrase in list_of_phrases.phrases:
+    if phrase.intent in phrases[bot.language]:
+      phrases[bot.language][phrase.intent] = [text for text in phrases[bot.language][phrase.intent] if text != phrase.text]
+  update_phrases(phrases)
+  return Response(status_code=HTTPStatus.OK)
