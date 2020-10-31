@@ -7,7 +7,6 @@ robert is a BERT-based bot using a fastapi server as interface to modify and upd
 pip install -r requirements.txt
 export ABOTKIT_ROBERT_PORT=5000 # or any port you want to use
 
-pip install gunicorn
 # use hot reload in development and during testing
 uvicorn robert:app --reload
 
