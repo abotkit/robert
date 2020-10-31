@@ -1,5 +1,5 @@
 # robert
-robert is a BERT-based bot using a flask server as interface to modify and update phrases, intents and actions.
+robert is a BERT-based bot using a fastapi server as interface to modify and update phrases, intents and actions.
 
 # quickstart
 
@@ -7,12 +7,12 @@ robert is a BERT-based bot using a flask server as interface to modify and updat
 pip install -r requirements.txt
 export ABOTKIT_ROBERT_PORT=5000 # or any port you want to use
 
-# in development mode
-python robert.py
-
-# for production usage
 pip install gunicorn
-gunicorn --bind 0.0.0.0:$ABOTKIT_ROBERT_PORT robert:app
+# use hot reload in development and during testing
+uvicorn robert:app --reload
+
+# remove --reload for production usage
+uvicorn robert:app --port $ABOTKIT_ROBERT_PORT 
 ```
 
 # environment variables
