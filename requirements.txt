@@ -3,6 +3,7 @@ sentence-transformers>=0.3,<0.4
 fastapi==0.61.1
 fastapi-utils==0.2.1
 uvicorn==0.12.2
+gunicorn==20.0.4
 # tf needed because of https://github.com/huggingface/transformers/issues/7333
 # can be removed if peer dependency is fixed
 tensorflow==2.3.1

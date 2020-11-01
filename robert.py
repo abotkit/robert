@@ -1,6 +1,7 @@
 import os
 import pickle
 import json
+import logging
 
 from http import HTTPStatus
 from fastapi import FastAPI, Response, Body, Request
@@ -11,9 +12,11 @@ from persistence.bot_writer import BotWriter
 from api.models import Message, Language, NewExample, DeleteAction, RemoveExample, Action, Phrase, ListOfPhrases, BotMeta
 
 app = FastAPI()
+logging.basicConfig(level=logging.DEBUG)
 
 bot = None
 core = None
+minio_client = None
 
 CACHE_PATH = 'bot.pkl'
 CONFIGURATION = 'bot.json'
@@ -24,7 +27,7 @@ USE_MINIO = str(os.environ.get('ABOTKIT_ROBERT_USE_MINIO', 'False')).lower() == 
 MINIO_URL = os.environ.get('ABOTKIT_ROBERT_MINIO_URL', 'localhost')
 MINIO_PORT = str(os.environ.get('ABOTKIT_ROBERT_MINIO_PORT', '9000'))
 MINIO_SECRET_KEY = str(os.environ.get('ABOTKIT_ROBERT_MINIO_SECRET_KEY', 'A_SECRET_KEY'))
-MINIO_ACCESS_KEY = str(os.environ.get('ABOTKIT_ROBERT_MINIO_ACCESS_KEY', 'A_SECRET_KEY'))
+MINIO_ACCESS_KEY = str(os.environ.get('ABOTKIT_ROBERT_MINIO_ACCESS_KEY', 'AN_ACCESS_KEY'))
 
 def cache_bot():
   with open(CACHE_PATH, "wb") as handle:
@@ -34,6 +37,38 @@ def store_bot():
   global HAS_UPDATES
   HAS_UPDATES = True
 
+def upload_bot():
+  if not (minio_client.bucket_exists(bot.id)):
+    minioClient.make_bucket(bot.id, location="eu-west-1")
+
+  files = [CONFIGURATION, PHRASES_FILE]
+
+  for filepath in files:
+    try:
+      file_meta = os.stat(filepath)
+      with open(filepath, 'rb') as handle:
+        minioClient.put_object(bot.id, os.path.split(filepath)[-1], handle, file_meta.st_size)
+    except ResponseError as error:
+        logging.warning('MinIO upload failed')
+        logging.error(error)
+
+def download_bot():
+  files = [CONFIGURATION, PHRASES_FILE]
+
+  if (minio_client.bucket_exists(bot.id)):
+    try:
+      for filepath in files:
+        filename = os.path.split(filepath)[-1]
+        data = minioClient.get_object(bot.id, os.path.split(filepath)[-1])
+        with open(filepath, 'wb') as handle:
+          for block in data.stream(32*1024):
+              handle.write(block)
+    except ResponseError as error:
+        logging.warning('MinIO download of {} failed'.format(filename))
+        logging.error(error)
+  else:
+    logging.info('Failed to download bot from S3. Bot does not exist.')
+
 @app.on_event("startup")
 @repeat_every(seconds=60*5)
 def store_files() -> None:
@@ -42,12 +77,21 @@ def store_files() -> None:
     BotWriter(bot).write(CONFIGURATION)
     HAS_UPDATES = False
     cache_bot()
-    # TODO: Push files to MinIO
+    if USE_MINIO:
+      upload_bot()
 
 @app.on_event("startup")
 def startup_event():
   global bot
   global core
+
+  if USE_MINIO:
+    from minio import Minio
+    from minio.error import ResponseError
+    global minio_client
+
+    minio_client = Minio('{}:{}'.format(MINIO_URL, MINIO_PORT), access_key=MINIO_ACCESS_KEY, secret_key=MINIO_SECRET_KEY)
+    download_bot()
 
   if os.path.exists(CACHE_PATH):
     with open(CACHE_PATH, "rb") as handle:

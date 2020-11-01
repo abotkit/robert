@@ -1,7 +1,6 @@
 # Writes current bot to a json file
 import json
 
-
 class BotWriter:
     def __init__(self, bot):
         self.bot = bot
@@ -22,6 +21,7 @@ class BotWriter:
     def data(self):
         return {
             'name': self.bot.name,
+            'id': self.id,
             'language': self.bot.language,
             'core': self._core(),
             'actions': self._actions(),

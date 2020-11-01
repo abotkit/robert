@@ -4,7 +4,6 @@ from core.core import CORE_DICT
 from actions.actions import ACTION_DICT
 from bot import Bot
 
-
 class BotReader:
     def __init__(self, file_name):
         self.file_name = file_name
@@ -13,6 +12,7 @@ class BotReader:
         with open(self.file_name) as f:
             data = json.load(f)
             self.name = data['name']
+            self.id = data['id']
             self.core = data['core']
             self.actions = data['actions']
             self.language = data['language']
