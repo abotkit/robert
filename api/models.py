@@ -17,7 +17,7 @@ class RemoveExample(BaseModel):
 
 class Action(BaseModel):
   name: str
-  settings: str
+  settings: dict
   intent: str
 
 class DeleteAction(BaseModel):

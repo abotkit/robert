@@ -117,10 +117,10 @@ def intent(message: Message):
 
 @app.post('/handle')
 def handle_route(message: Message):
-  return {
+  return [{
     "recipient_id": message.identifier,
     "text": bot.handle(message.query)
-  }
+  }]
 
 @app.post('/explain')
 def explain_route(message: Message):
