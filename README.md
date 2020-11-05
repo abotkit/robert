@@ -20,7 +20,7 @@ gunicorn robert:app -b 0.0.0.0:${ABOTKIT_ROBERT_PORT} -p robert.pid -k uvicorn.w
 |---------------------|--------------------------------|----------------------|
 | ABOTKIT_ROBERT_PORT | port for starting robert       |   5000               |
 | ABOTKIT_ROBERT_USE_MINIO | use MinIO flag ('True' or 'False')  | 'False' |
-| ABOTKIT_ROBERT_MINIO_URL | MinIO host name or url | 'localhost |
-| ABOTKIT_ROBERT_MINIO_PORT | MinIO port | '9000 |
+| ABOTKIT_ROBERT_MINIO_URL | MinIO host name or url | 'localhost' |
+| ABOTKIT_ROBERT_MINIO_PORT | MinIO port | 9000 |
 | ABOTKIT_ROBERT_MINIO_SECRET_KEY | MinIO secret key | 'A_SECRET_KEY' |
 | ABOTKIT_ROBERT_MINIO_ACCESS_KEY | MinIO access key | 'AN_ACCESS_KEY' |
