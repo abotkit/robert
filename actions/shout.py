@@ -7,6 +7,8 @@ class ShoutAction(Action):
     """.strip()
 
     def __init__(self, settings={}):
+        self.name = ShoutAction.name
+        self.description = ShoutAction.description
         super().__init__(settings) 
 
     def execute(self, query, intent=None, data_collection={}, language='en'):

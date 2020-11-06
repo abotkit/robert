@@ -6,6 +6,8 @@ class SendMailAction(Action):
     description = 'A send mail action'
     
     def __init__(self, settings={}):
+        self.name = SendMailAction.name
+        self.description = SendMailAction.description
         default = {
             'port': 465, # SSL,
             'smtp_server': 'smtp.gmail.com'

@@ -8,6 +8,9 @@ class HNAction(Action):
     """.strip()
 
     def __init__(self, settings={}):
+        print(self.name)
+        self.name = HNAction.name
+        self.description = HNAction.description
         super().__init__(settings) 
 
     def execute(self, query, intent=None, data_collection={}, language='en'):

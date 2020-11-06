@@ -13,6 +13,8 @@ class OpenWeatherAction(Action):
     """.strip()
 
     def __init__(self, settings={}):
+        self.name = OpenWeatherAction.name
+        self.description = OpenWeatherAction.description
         super().__init__(settings)
 
     def execute(self, query, intent=None, data_collection={}, language='en'):

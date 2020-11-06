@@ -1,6 +1,6 @@
 {
   "name": "Robert",
-  "uuid": "5c66e4d4-bb60-4501-9fcf-18c3ce7f6c33",
+  "id": "5c66e4d4-bb60-4501-9fcf-18c3ce7f6c33",
   "language": "de",
   "core": {
     "name": "transformer",

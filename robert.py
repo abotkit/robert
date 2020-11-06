@@ -149,7 +149,12 @@ def intent_examples(intent: str):
 
 @app.get('/example')
 def get_examples():
-  return core.intents
+  intents = [{
+    'name': intent,
+    'action': bot.find_action_by_intent(intent)['action'].name
+    } for intent in set(core.intents.values())]
+
+  return intents
 
 @app.post('/example')
 def get_examples(example: NewExample):

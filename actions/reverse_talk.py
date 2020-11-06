@@ -7,6 +7,8 @@ class ReverseAction(Action):
     """.strip()
 
     def __init__(self, settings={}):
+        self.name = ReverseAction.name
+        self.description = ReverseAction.description
         super().__init__(settings) 
 
     def execute(self, query, intent=None, data_collection={}, language='en'):

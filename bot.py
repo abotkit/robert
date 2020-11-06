@@ -15,10 +15,10 @@ class Bot:
     def _find_action_by_name(self, action_name):
         return next(a for a in self.actions if a['action'].name == action_name)
 
-    def _find_action_by_intent(self, intent):
-        return next(
+    def find_action_by_intent(self, intent):
+        return next((
             a for a in self.actions
-            if a['active'] is not False and intent in a['active']['intents'])
+            if a['active'] is not False and intent in a['active']['intents']), None)
 
     def update_actions(self):
         for action in self.actions:
@@ -49,7 +49,7 @@ class Bot:
         if intent is None:
             return explanation
 
-        action = self._find_action_by_intent(intent)['action']
+        action = self.find_action_by_intent(intent)['action']
 
         if action is not None:
             explanation['action'] = {
@@ -76,7 +76,7 @@ class Bot:
         if intent is None:
             raise Exception('No intent detected')
 
-        action = self._find_action_by_intent(intent)['action']
+        action = self.find_action_by_intent(intent)['action']
 
         if action is None:
             raise Exception('No action found')

@@ -15,6 +15,8 @@ class TalkAction(Action):
             self.answers = json.load(handle)
 
     def __init__(self, settings={}):
+        self.name = TalkAction.name
+        self.description = TalkAction.description
         super().__init__(settings)
         self.__read_phrases()
 
