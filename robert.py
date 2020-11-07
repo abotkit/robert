@@ -70,9 +70,11 @@ def download_bot():
     logging.info('Failed to download bot from S3. Bot does not exist.')
 
 @app.on_event("startup")
-@repeat_every(seconds=60*5)
+@repeat_every(seconds=10)
 def store_files() -> None:
   global HAS_UPDATES
+  global bot
+
   if HAS_UPDATES:
     BotWriter(bot).write(CONFIGURATION)
     HAS_UPDATES = False

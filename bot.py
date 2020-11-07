@@ -3,9 +3,10 @@ from actions.actions import ACTIONS
 
 
 class Bot:
-    def __init__(self, core, name='<no name>', language='en'):
+    def __init__(self, core, name='<no name>', language='en', id='00000000-000-0000-0000-000000000000'):
         self.name = name
         self.core = core
+        self.id = id
         self.language = language
         self.actions = [{
             'action': a(),

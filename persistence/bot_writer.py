@@ -21,7 +21,7 @@ class BotWriter:
     def data(self):
         return {
             'name': self.bot.name,
-            'id': self.id,
+            'id': self.bot.id,
             'language': self.bot.language,
             'core': self._core(),
             'actions': self._actions(),

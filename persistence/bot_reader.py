@@ -33,7 +33,7 @@ class BotReader:
 
     def load(self):
         self._read_file()
-        self.bot = Bot(self._core(), name=self.name, language=self.language)
+        self.bot = Bot(self._core(), name=self.name, language=self.language, id=self.id)
         self._add_actions()
 
         return self.bot
