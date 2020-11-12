@@ -70,7 +70,7 @@ def download_bot():
     logging.info('Failed to download bot from S3. Bot does not exist.')
 
 @app.on_event("startup")
-@repeat_every(seconds=10)
+@repeat_every(seconds=5*60)
 def store_files() -> None:
   global HAS_UPDATES
   global bot
@@ -196,19 +196,12 @@ def delete_action(action: DeleteAction):
 def get_name():
   return bot.name
 
-@app.post('/name')
-def set_name(meta: BotMeta):
-  bot.name = meta.name
-  store_bot()
-  return Response(status_code=HTTPStatus.OK)
-
 @app.get('/available/actions')
 def available_actions():
   return [{
       'name': action.name,
       'description': action.description
   } for action in ACTIONS]
-
 
 def read_phrases():
   phrases_file = PHRASES_FILE
