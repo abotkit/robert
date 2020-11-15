@@ -6,6 +6,7 @@ uvicorn==0.12.2
 gunicorn==20.0.4
 uvloop==0.14.0
 geotext==0.4.0
+httptools==0.1.1
 # tf needed because of https://github.com/huggingface/transformers/issues/7333
 # can be removed if peer dependency is fixed
 tensorflow==2.3.1
