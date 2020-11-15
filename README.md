@@ -1,7 +1,7 @@
 # robert
 robert is a BERT-based bot using a fastapi server as interface to modify and update phrases, intents and actions.
 
-# quickstart
+# Quickstart
 
 ```zsh
 pip install -r requirements.txt
@@ -14,7 +14,7 @@ uvicorn robert:app --reload
 gunicorn robert:app -b 0.0.0.0:${ABOTKIT_ROBERT_PORT} -p robert.pid -k uvicorn.workers.UvicornWorker --timeout 120 --workers=1 --access-logfile access.log --log-level DEBUG --log-file app.log
 ```
 
-# environment variables
+# Environment variables
 
 |         name        |        description             |    default           |
 |---------------------|--------------------------------|----------------------|
@@ -24,3 +24,7 @@ gunicorn robert:app -b 0.0.0.0:${ABOTKIT_ROBERT_PORT} -p robert.pid -k uvicorn.w
 | ABOTKIT_ROBERT_MINIO_PORT | MinIO port | 9000 |
 | ABOTKIT_ROBERT_MINIO_SECRET_KEY | MinIO secret key | 'A_SECRET_KEY' |
 | ABOTKIT_ROBERT_MINIO_ACCESS_KEY | MinIO access key | 'AN_ACCESS_KEY' |
+
+# Issues
+
+We use our [main repository](https://github.com/abotkit/abotkit) to track our issues. Please use [this site](https://github.com/abotkit/abotkit/issues) to report an issue. Thanks! :blush:
