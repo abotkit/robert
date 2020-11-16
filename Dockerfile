@@ -13,4 +13,6 @@ COPY . /opt/robert
 EXPOSE 5000
 ENV ABOTKIT_ROBERT_PORT=5000
 
+RUN chmod 777 -R /root/.cache
+
 ENTRYPOINT gunicorn robert:app -b 0.0.0.0:${ABOTKIT_ROBERT_PORT} -k uvicorn.workers.UvicornWorker --timeout 120 --workers=1 --log-level DEBUG
