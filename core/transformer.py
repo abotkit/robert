@@ -3,8 +3,7 @@ import scipy.spatial
 
 MAX_DISTANCE = 0.7
 
-DEFAULT_MODEL = 'xlm-r-100langs-bert-base-nli-stsb-mean-tokens'
-
+DEFAULT_MODEL = 'https://public.ukp.informatik.tu-darmstadt.de/reimers/sentence-transformers/v0.2/xlm-r-100langs-bert-base-nli-stsb-mean-tokens.zip'
 
 class TransformerCore:
     name = 'transformer'

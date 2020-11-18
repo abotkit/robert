@@ -1,7 +1,7 @@
 FROM python:3.7-slim
 
 RUN apt-get update -y
-RUN apt-get install -y curl
+RUN apt-get install -y curl wget unzip
 
 COPY requirements.txt /opt/robert/requirements.txt
 WORKDIR /opt/robert
@@ -13,6 +13,4 @@ COPY . /opt/robert
 EXPOSE 5000
 ENV ABOTKIT_ROBERT_PORT=5000
 
-RUN chmod 777 -R /root/.cache
-
-ENTRYPOINT gunicorn robert:app -b 0.0.0.0:${ABOTKIT_ROBERT_PORT} -k uvicorn.workers.UvicornWorker --timeout 120 --workers=1 --log-level DEBUG
+ENTRYPOINT gunicorn robert:app -b 0.0.0.0:${ABOTKIT_ROBERT_PORT} -k uvicorn.workers.UvicornWorker --timeout 600 --workers=1 --log-level DEBUG
