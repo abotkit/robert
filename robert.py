@@ -96,14 +96,18 @@ def startup_event():
     download_bot()
 
   if os.path.exists(CACHE_PATH):
-    with open(CACHE_PATH, "rb") as handle:
-      bot = pickle.load(handle)
-      core = bot.core
-  else:
-    path = os.path.join(CONFIGURATION)
-    bot = BotReader(path).load()
-    core = bot.core
-    cache_bot()
+    try:
+      with open(CACHE_PATH, "rb") as handle:
+        bot = pickle.load(handle)
+        core = bot.core
+      return
+    except:
+      logging.warning('{} is broken. Fallback to json configuration'.format(CACHE_PATH))     
+
+  path = os.path.join(CONFIGURATION)
+  bot = BotReader(path).load()
+  core = bot.core
+  cache_bot()
 
 @app.get("/")
 def root():
