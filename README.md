@@ -8,10 +8,16 @@ pip install -r requirements.txt
 export ABOTKIT_ROBERT_PORT=5000 # or any port you want to use
 
 # use hot reload in development and during testing
-uvicorn robert:app --reload
+uvicorn robert:app --reload --port ${ABOTKIT_ROBERT_PORT}
 
 # use uvicorn wrapped by gunicorn in production
 gunicorn robert:app -b 0.0.0.0:${ABOTKIT_ROBERT_PORT} -p robert.pid -k uvicorn.workers.UvicornWorker --timeout 120 --workers=1 --access-logfile access.log --log-level DEBUG --log-file app.log
+
+# for testing
+curl -X POST -H "Content-Type: application/json" -d "{\"query\":\"hi\", \"identifier\":\"unique-char-id\"}" localhost:${ABOTKIT_ROBERT_PORT}/handle       
+
+# should give you something like
+# [{"recipient_id":"unique-char-id","text":"Hey"}]
 ```
 
 # Environment variables
