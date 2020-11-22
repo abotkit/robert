@@ -145,7 +145,7 @@ def set_language(language: Language):
   else:
     return Response(status_code=HTTPStatus.BAD_REQUEST, content='language not supported.')
 
-@app.get('/example/{intent}')
+@app.get('/intent/examples')
 def intent_examples(intent: str):
     examples = []
     for example in core.intents:
