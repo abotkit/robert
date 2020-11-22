@@ -185,7 +185,7 @@ def get_actions():
 
 @app.post('/actions')
 def add_action(action: Action):  
-  result = next(a for a in ACTIONS if a.name == action.name)
+  result = next(a for a in ACTIONS if a.name.lower() == action.name.lower())
   bot.add_action(action.intent, result(settings=action.settings))
   store_bot()
   return Response(status_code=HTTPStatus.OK)

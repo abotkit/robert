@@ -1,5 +1,9 @@
 {
   "de": {
+    "bot_challenge": [
+      "I'm a chatbot and my name is robert.",
+      "I'm robert. A Chatbot. Nice to meet you :)"
+    ],
     "bye": [
       "Tsch\u00fc\u00df",
       "Bis bald",
@@ -13,8 +17,7 @@
       "Hey",
       "Moin",
       "Na",
-      "Ola",
-      "hi"
+      "Hi"
     ]
   },
   "en": {
