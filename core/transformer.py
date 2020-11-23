@@ -2,7 +2,6 @@ from sentence_transformers import SentenceTransformer
 import scipy.spatial
 
 MAX_DISTANCE = 0.7
-
 DEFAULT_MODEL = 'https://public.ukp.informatik.tu-darmstadt.de/reimers/sentence-transformers/v0.2/xlm-r-100langs-bert-base-nli-stsb-mean-tokens.zip'
 
 class TransformerCore:
@@ -57,40 +56,3 @@ class TransformerCore:
                 best_intent = self.intents[example]
 
         return {'score': 1.0 - best_dist, 'intent': best_intent}
-
-
-def main():
-    intents = {
-        'How is the weather?': 'weather',
-        'Send an email': 'email',
-        'Hello': 'greeting'
-    }
-
-    t = TransformerCore()
-    t.load_intents(intents)
-    t.add_intent('Play music', 'music')
-
-    test_queries = [
-        'Was it sunny yesterday?',
-        'Play some jazz',
-        'Send Peter an email',
-        'Hi!',
-    ]
-
-    for query in test_queries:
-        print(f"Query: '{query}'")
-        print(t.intent_of(query))
-
-
-if __name__ == '__main__':
-    main()
-
-    # Output:
-    # > Query: 'Was it sunny yesterday?'
-    # > {'score': 0.5381054447563607, 'intent': 'weather'}
-    # > Query: 'Play some jazz'
-    # > {'score': 0.5316503575779188, 'intent': 'music'}
-    # > Query: 'Send Peter an email'
-    # > {'score': 0.59165012001151, 'intent': 'email'}
-    # > Query: 'Hi!'
-    # > {'score': 0.672180518003876, 'intent': 'greeting'}

@@ -1,0 +1,152 @@
+{
+  "bot": {
+    "name": "Robert",
+    "id": "5c66e4d4-bb60-4501-9fcf-18c3ce7f6c33",
+    "language": "de",
+    "core": {
+      "name": "transformer",
+      "intents": {
+        "hey": "hello",
+        "hello": "hello",
+        "hi": "hello",
+        "hello there": "hello",
+        "good morning": "hello",
+        "good evening": "hello",
+        "hey there": "hello",
+        "let's go": "hello",
+        "hey dude": "hello",
+        "goodmorning": "hello",
+        "goodevening": "hello",
+        "good afternoon": "hello",
+
+        "Hackernews": "hacker_news",
+        "Hacker news": "hacker_news",
+        "What is on Hackernews today?": "hacker_news",
+
+        "cu": "goodbye",
+        "good by": "goodbye",
+        "cee you later": "goodbye",
+        "good night": "goodbye",
+        "bye": "goodbye",
+        "goodbye": "goodbye",
+        "have a nice day": "goodbye",
+        "see you around": "goodbye",
+        "bye bye": "goodbye",
+        "see you later": "goodbye",
+
+        "can you shout?": "shout",
+        "shout!": "shout",
+        "shout for me": "shout",
+
+        "are you a bot?": "bot_challenge",
+        "are you a human?": "bot_challenge",
+        "am I talking to a bot?": "bot_challenge",
+        "am I talking to a human?": "bot_challenge",
+
+        "how is the weather right now?": "weather",
+        "How is the weather now?": "weather",
+        "how hot will it be today?": "weather",
+        "is the sun shining today?": "weather",
+        "is there rain today?": "weather"
+      }
+    },
+    "actions": [
+      {
+        "name": "Shout",
+        "settings": {},
+        "active": {
+          "intents": [
+            "shout"
+          ]
+        }
+      },
+      {
+        "name": "Mail",
+        "settings": {
+          "port": 465,
+          "smtp_server": "smtp.gmail.com"
+        },
+        "active": false
+      },
+      {
+        "name": "Talk",
+        "settings": {},
+        "active": {
+          "intents": [
+            "hello",
+            "goodbye",
+            "bot_challenge"
+          ]
+        }
+      },
+      {
+        "name": "Hackernews - Top Story",
+        "settings": {},
+        "active": {
+          "intents": [
+            "hacker_news"
+          ]
+        }
+      },
+      {
+        "name": "Weather",
+        "settings": {},
+        "active": {
+          "intents": [
+            "weather"
+          ]
+        }
+      },
+      {
+        "name": "Reverse",
+        "settings": {},
+        "active": false
+      }
+    ]
+  },
+  "phrases": {
+    "de": {
+      "hello": [
+        "Hallo!",
+        "Hi, wie geht's?",
+        "Hey",
+        "Moin",
+        "Guten Tag"
+      ],
+      "goodbye": [
+        "Tsch\u00fc\u00df",
+        "Bis bald",
+        "Bis dann",
+        "Bis sp\u00e4ter!",
+        "Ciao!"
+      ],
+      "bot_challenge": [
+        "Ich bin ein Chatbot und mein Name ist ${name}.",
+        "Ich bin ${name}. Ein Chatbot. Schön dich kennenzulernen!"
+      ]
+    },
+    "en": {
+      "hello": [
+        "Hello!",
+        "Hello, friend.",
+        "Howdy",
+        "What's up",
+        "Hello mister",
+        "How you doin?",
+        "Hi"
+      ],
+      "goodbye": [
+        "Bye",
+        "Goodbye!",
+        "Talk to you later",
+        "Have a nice day",
+        "Take care",
+        "Catch you later"
+      ],
+      "bot_challenge": [
+        "I'm a chatbot and my name is ${name}.",
+        "I'm ${name}. A Chatbot. Nice to meet you :)"
+      ]
+    }
+  }
+}

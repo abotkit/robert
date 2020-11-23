@@ -20,6 +20,7 @@ minio_client = None
 
 CACHE_PATH = 'bot.pkl'
 CONFIGURATION = 'bot.json'
+DEFAULT_CONFIGURATION = 'default.json'
 PHRASES_FILE = os.path.join('actions', 'phrases.json')
 HAS_UPDATES = False
 
@@ -97,12 +98,23 @@ def startup_event():
 
   if os.path.exists(CACHE_PATH):
     try:
-      with open(CACHE_PATH, "rb") as handle:
+      with open(CACHE_PATH, 'rb') as handle:
         bot = pickle.load(handle)
         core = bot.core
       return
     except:
       logging.warning('{} is broken. Fallback to json configuration'.format(CACHE_PATH))     
+
+  if not os.path.exists(CONFIGURATION):
+    logging.info('{} not found. Setup a brand new bot.'.format(CONFIGURATION))
+    with open(DEFAULT_CONFIGURATION) as handle:
+      data = json.load(handle)
+
+    with open(CONFIGURATION, 'w') as handle:
+      json.dump(data['bot'], handle, indent=2)
+    
+    with open(PHRASES_FILE, 'w') as handle:
+      json.dump(data['phrases'], handle, indent=2)
 
   path = os.path.join(CONFIGURATION)
   bot = BotReader(path).load()

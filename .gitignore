@@ -1,5 +1,8 @@
+# user config
 .DS_Store
 *.pkl
+bot.json
+actions/phrases.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

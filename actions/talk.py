@@ -26,12 +26,14 @@ class TalkAction(Action):
     def execute(self, query, intent=None, data_collection={}, language='en'):
         if language == 'de':
             if intent in self.answers['de']:
-                return choice(self.answers['de'][intent])
+                answer = choice(self.answers['de'][intent])
+                return answer.replace('${name}', self.settings['bot_name'])
             else:
                 return 'Das sieht nach gar nichts aus für mich'
         else:
             if intent in self.answers['en']:
-                return choice(self.answers['en'][intent])
+                answer = choice(self.answers['en'][intent])
+                return answer.replace('${name}', self.settings['bot_name'])
             else:
                 return 'Doesn\'t look like anything to me'
 
