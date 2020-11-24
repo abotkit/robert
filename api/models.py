@@ -14,6 +14,7 @@ class NewExample(BaseModel):
 
 class RemoveExample(BaseModel):
   example: str
+  intent: Optional[str] = None
 
 class Action(BaseModel):
   name: str
