@@ -17,20 +17,20 @@ class OpenWeatherAction(Action):
         self.description = OpenWeatherAction.description
         super().__init__(settings)
 
-    def execute(self, query, intent=None, data_collection={}, language='en'):
+    def execute(self, query, intent=None, extra={}):
         if 'appid' not in self.settings:
             return NO_APPID
         
-        if 'cities' not in data_collection:
+        if 'cities' not in extra['data_collection']:
             return NO_CITY
-        elif not data_collection['cities']:
+        elif not extra['data_collection']['cities']:
             return NO_CITY
 
-        city = data_collection['cities'][0]
+        city = extra['data_collection']['cities'][0]
 
         appid = self.settings['appid']
         response = requests.get(FORECAST_URL.format(city, appid)).json()
-        if language == 'de':
+        if extra['language'] == 'de':
             description = f"In {city} ist es zur Zeit {response['main']['temp']}C " \
                 + f"mit {response['weather'][0]['description']} " \
                 + f"und einer gefühlten Temperatur von {response['main']['feels_like']}C. "
@@ -39,15 +39,3 @@ class OpenWeatherAction(Action):
                 + f"with {response['weather'][0]['description']} " \
                 + f"and feels like {response['main']['feels_like']}C. "
         return description
-
-
-def main():
-    action = OpenWeatherAction(
-        settings={'appid': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx'})
-    print(action.execute('hello', data_collection={}))
-    print(action.execute('hello', data_collection={'cities': []}))
-    print(action.execute('hello', data_collection={'cities': ['London']}))
-
-
-if __name__ == '__main__':
-    main()

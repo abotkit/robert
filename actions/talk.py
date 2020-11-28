@@ -23,8 +23,8 @@ class TalkAction(Action):
     def update(self):
         self.__read_phrases()
 
-    def execute(self, query, intent=None, data_collection={}, language='en'):
-        if language == 'de':
+    def execute(self, query, intent=None, extra={}):
+        if extra['language'] == 'de':
             if intent in self.answers['de']:
                 answer = choice(self.answers['de'][intent])
                 return answer.replace('${name}', self.settings['bot_name'])

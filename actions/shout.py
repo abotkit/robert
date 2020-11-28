@@ -11,7 +11,7 @@ class ShoutAction(Action):
         self.description = ShoutAction.description
         super().__init__(settings) 
 
-    def execute(self, query, intent=None, data_collection={}, language='en'):
+    def execute(self, query, intent=None, extra={}):
         return query.upper()
 
 

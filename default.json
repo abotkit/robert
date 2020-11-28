@@ -47,7 +47,12 @@
         "How is the weather now?": "weather",
         "how hot will it be today?": "weather",
         "is the sun shining today?": "weather",
-        "is there rain today?": "weather"
+        "is there rain today?": "weather",
+
+        "\"Hello my friend\" is also an example for intent \"hello\"": "add_example",
+        "\"Ok fine\" is also an example for intent \"accept\"": "add_example",
+        "\"is it sunny today\" is also an example for intent weather": "add_example",
+        "\"you are a bot right?\" is also an example for intent \"bot_challenge\"": "add_example"
       }
     },
     "actions": [
@@ -98,9 +103,13 @@
         }
       },
       {
-        "name": "Reverse",
+        "name": "Add Example",
         "settings": {},
-        "active": false
+        "active": {
+          "intents": [
+            "add_example"
+          ]
+        }
       }
     ]
   },

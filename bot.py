@@ -85,4 +85,11 @@ class Bot:
             raise Exception('No action found')
 
         data_collection = self.__data_collection(query)
-        return action.execute(query, intent=intent, data_collection=data_collection, language=self.language)
+
+        extra = {
+            'data_collection': data_collection,
+            'language': self.language,
+            'core': self.core
+        }
+
+        return action.execute(query, intent=intent, extra=extra)
