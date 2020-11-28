@@ -6,6 +6,17 @@ FORECAST_URL = 'http://api.openweathermap.org/data/2.5/weather?q={}&APPID={}&uni
 NO_CITY = 'I could not find a city'
 NO_APPID = 'There is no openweathermap app id that I could use'
 
+responses = {
+    'de': {
+        'NO_CITY': 'Um das Wetter nachzusehen benötige ich eine Stadt. Leider konnte ich aus deiner Anfrage keine Stadt herauslesen.',
+        'NO_APPID': 'Zur Zeit ist keine openweathermap App-Id hinterlegt'
+    },
+    'en': {
+        'NO_CITY': 'I need a city to check the weather. Unfortunately I could not find a city in your request.',
+        'NO_APPID': 'There is no openweathermap app id configured that I could use'
+    }
+}
+
 class OpenWeatherAction(Action):
     name = "Weather"
     description = """
@@ -18,13 +29,15 @@ class OpenWeatherAction(Action):
         super().__init__(settings)
 
     def execute(self, query, intent=None, extra={}):
+        language = extra['language']
+
         if 'appid' not in self.settings:
-            return NO_APPID
+            return responses[language]['NO_APPID']
         
         if 'cities' not in extra['data_collection']:
-            return NO_CITY
+            return responses[language]['NO_CITY']
         elif not extra['data_collection']['cities']:
-            return NO_CITY
+            return responses[language]['NO_CITY']
 
         city = extra['data_collection']['cities'][0]
 
